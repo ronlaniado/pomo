@@ -1,15 +1,16 @@
 chrome.runtime.onConnect.addListener(function(port) {
 	console.assert(port.name == "timer");
-	let sec = 60;
-	let min = 52;
-	let timeSeperator = ":";
 	port.onMessage.addListener(function(msg) {
 		if (msg.initTimer == "Start timer") {
+			let sec = msg.sec;
+			let min = msg.min;
+			let timeSeperator = msg.timeSeperator;
+			let port2 = chrome.runtime.connect({ name: "port2" });
 			const startTimer = setInterval(() => {
 				console.log("Time started");
 				if (sec > 0) {
 					if (sec < 11) {
-						port.postMessage({
+						port2.postMessage({
 							timeSeperator: ":0",
 							sec: sec - 1,
 							min: min
@@ -19,12 +20,12 @@ chrome.runtime.onConnect.addListener(function(port) {
 					} else {
 						if (sec === 60) {
 							//Verifies that if the the time is x:00, the x will first be decremented by 1, since that makes sense in an actual clock
-							port.postMessage({
+							port2.postMessage({
 								min: min - 1
 							});
 							min--;
 						}
-						port.postMessage({
+						port2.postMessage({
 							timeSeperator: ":",
 							sec: sec - 1,
 							min: min
@@ -32,7 +33,7 @@ chrome.runtime.onConnect.addListener(function(port) {
 						sec--;
 					}
 				} else if (min > 0) {
-					port.postMessage({
+					port2.postMessage({
 						currentMin: min - 1,
 						sec: 59,
 						timeSeperator: ":"

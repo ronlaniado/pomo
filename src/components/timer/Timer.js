@@ -28,18 +28,34 @@ export default class Timer extends React.Component {
 		});
 		console.log("The button was pressed");
 		let port = chrome.runtime.connect({ name: "timer" });
-		port.postMessage({ initTimer: "Start timer" });
-		port.onMessage.addListener(function(msg) {
-			console.log("The port has opened or whatnot");
-			let min = msg.min;
-			let sec = msg.sec;
-			let timeSeperator = msg.timeSeperator;
-			currentComponent.setState({
-				currentMin: min,
-				currentSec: sec,
-				timeSeperator: timeSeperator
+		port.postMessage({
+			initTimer: "Start timer",
+			sec: this.state.currentSec,
+			min: this.state.currentMin,
+			timeSeperator: this.state.timeSeperator
+		});
+		// port.onMessage.addListener(function(msg) {
+		// 	console.log("The port has opened or whatnot");
+		// 	let min = msg.min;
+		// 	let sec = msg.sec;
+		// 	let timeSeperator = msg.timeSeperator;
+		// 	currentComponent.setState({
+		// 		currentMin: min,
+		// 		currentSec: sec,
+		// 		timeSeperator: timeSeperator
+		// 	});
+		// });
+		chrome.runtime.onConnect.addListener(function(port2) {
+			console.assert(port.name == "port2");
+			port.onMessage.addListener(function(msg) {
+				currentComponent.setState({
+					currentMin: msg.min,
+					currentSec: msg.sec,
+					timeSeperator: msg.timeSeperator
+				});
 			});
 		});
+
 		// var port = chrome.runtime.connect({ name: "knockknock" });
 		// port.postMessage({ joke: "Knock knock" });
 		// port.onMessage.addListener(function(msg) {

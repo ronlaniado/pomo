@@ -12,7 +12,7 @@
 			"128": "pomo.png"
 		}
 	},
-	"permissions": ["notifications"],
+	"permissions": ["notifications", "storage"],
 	"web_accessible_resources": ["pomo.png"],
 	"background": {
 		"scripts": ["background.js"],
