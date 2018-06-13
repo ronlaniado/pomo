@@ -1,0 +1,28 @@
+{
+	"short_name": "Pomo",
+	"name": "Pomo",
+	"manifest_version": 2,
+	"browser_action": {
+		"default_popup": "index.html",
+		"default_title": "Pomo",
+		"default_icon": {
+			"16": "pomo.png",
+			"32": "pomo.png",
+			"48": "pomo.png",
+			"128": "pomo.png"
+		}
+	},
+	"permissions": ["notifications"],
+	"web_accessible_resources": ["pomo.png"],
+	"background": {
+		"scripts": ["background.js"],
+		"persistent": false
+	},
+	"version": "1.0",
+	"icons": {
+		"16": "pomo.png",
+		"32": "pomo.png",
+		"48": "pomo.png",
+		"128": "pomo.png"
+	}
+}

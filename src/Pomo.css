@@ -1,0 +1,16 @@
+html {
+	font-family: 'Open Sans';
+	margin: 0 0 0 0;
+    width: 50%;  
+}
+.button {
+  display: inline-block;
+  position: relative;
+}
+h2 {
+  font-size: 28px;
+  text-align: center;
+}
+.buttons {
+  text-align: center;
+}

@@ -1,0 +1,12 @@
+.timer_message {
+	position: relative;
+	text-align: center;
+	vertical-align: middle;
+	width: auto;
+	height: auto;
+	margin: 0 auto;
+}
+
+.buttons {
+	position: relative;
+}
