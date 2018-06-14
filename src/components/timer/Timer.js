@@ -46,7 +46,7 @@ export default class Timer extends React.Component {
 		// 	});
 		// });
 		chrome.runtime.onConnect.addListener(function(port2) {
-			console.assert(port.name == "port2");
+			console.assert(port2.name == "port2");
 			port.onMessage.addListener(function(msg) {
 				currentComponent.setState({
 					currentMin: msg.min,
