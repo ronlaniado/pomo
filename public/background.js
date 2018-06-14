@@ -1,19 +1,101 @@
-let sec;
-let min;
-let timeSeperator;
-
 chrome.runtime.onConnect.addListener(function(port) {
 	console.assert(port.name == "timer");
 	port.onMessage.addListener(function(msg) {
+		let sec = msg.sec;
+		let min = msg.min;
+		let timeSeperator = msg.timeSeperator;
 		if (msg.initTimer == "Start timer") {
-			sec = msg.sec;
-			min = msg.min;
-			timeSeperator = msg.timeSeperator;
-			console.log(min + timeSeperator + sec);
-			newPort();
+			const startTimer = setInterval(() => {
+				port.onDisconnect.addListener(function() {
+					console.log(
+						"The port has been disconnected. The background script backup is now in effect"
+					);
+					disconnectedTimer(min, sec, timeSeperator);
+					clearInterval(startTimer);
+				});
+				console.log(min + timeSeperator + sec);
+				if (sec > 0) {
+					if (sec < 11) {
+						port.postMessage({
+							timeSeperator: ":0",
+							sec: sec - 1,
+							min: min
+						});
+						timeSeperator = ":0";
+						sec--;
+					} else {
+						if (sec === 60) {
+							//Verifies that if the the time is x:00, the x will first be decremented by 1, since that makes sense in an actual clock
+							port.postMessage({
+								min: min - 1
+							});
+							min--;
+						}
+						port.postMessage({
+							timeSeperator: ":",
+							sec: sec - 1,
+							min: min
+						});
+						sec--;
+					}
+				} else if (min > 0) {
+					port.postMessage({
+						currentMin: min - 1,
+						sec: 59,
+						timeSeperator: ":"
+					});
+					min--;
+					sec = 59;
+					timeSeperator = ":";
+				}
+				if (min === 0 && sec === 0) {
+					clearInterval(Startimer);
+				}
+			}, 1000);
 		}
 	});
 });
+
+function disconnectedTimer(min, sec, timeSeperator) {
+	const discTimer = setInterval(() => {
+		console.log("The disconnected timer is now in effect");
+		if (sec > 0) {
+			if (sec < 11) {
+				timeSeperator = ":0";
+				sec--;
+				listenPort();
+			} else {
+				if (sec === 60) {
+					min--;
+					listenPort();
+				}
+				sec--;
+				listenPort();
+			}
+		} else if (min > 0) {
+			min--;
+			sec = 59;
+			timeSeperator = ":";
+			listenPort();
+		}
+		if (min === 0 && sec === 0) {
+			clearInterval(this.discTimer);
+			listenPort();
+		}
+	}, 1000);
+}
+function listenPort() {
+	let port = chrome.runtime.connect({ name: "timer" });
+	port.onConnect.addListener(function(msg) {
+		if (msg.initTimer == "Start timer") {
+			port.postMessage({
+				sec: sec,
+				min: min,
+				timeSeperator: timeSeperator
+			});
+		}
+	});
+}
 
 // const startTimer = setInterval(() => {
 // 	console.log("Time started");
@@ -61,48 +143,4 @@ function show() {
 		icon: "pomo.png",
 		body: "It's time to take a break! You did it!"
 	});
-}
-function newPort() {
-	let port2 = chrome.runtime.connect({ name: "port2" });
-	const startTimer = setInterval(() => {
-		console.log(min + timeSeperator + sec);
-		if (sec > 0) {
-			if (sec < 11) {
-				port2.postMessage({
-					timeSeperator: ":0",
-					sec: sec - 1,
-					min: min
-				});
-				timeSeperator = ":0";
-				sec--;
-			} else {
-				if (sec === 60) {
-					//Verifies that if the the time is x:00, the x will first be decremented by 1, since that makes sense in an actual clock
-					port2.postMessage({
-						min: min - 1
-					});
-					min--;
-				}
-				port2.postMessage({
-					timeSeperator: ":",
-					sec: sec - 1,
-					min: min
-				});
-				sec--;
-			}
-		} else if (min > 0) {
-			port2.postMessage({
-				currentMin: min - 1,
-				sec: 59,
-				timeSeperator: ":"
-			});
-			min--;
-			sec = 59;
-			timeSeperator = ":";
-		}
-		if (min === 0 && sec === 0) {
-			clearInterval(this.Startimer);
-			show();
-		}
-	}, 1000);
 }

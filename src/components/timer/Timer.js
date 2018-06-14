@@ -18,8 +18,21 @@ export default class Timer extends React.Component {
 		this.resetTimer = this.resetTimer.bind(this);
 		this.motivate = this.motivate.bind(this);
 	}
-	startTimer() {
+	componentDidMount() {
 		let currentComponent = this;
+		port.onMessage.addListener(function(msg) {
+			console.log("The port has opened or whatnot");
+			let min = msg.min;
+			let sec = msg.sec;
+			let timeSeperator = msg.timeSeperator;
+			currentComponent.setState({
+				currentMin: min,
+				currentSec: sec,
+				timeSeperator: timeSeperator
+			});
+		});
+	}
+	startTimer() {
 		this.motivate();
 		this.origSec = this.state.currentSec; //The orignal amount of seconds, before the timer started
 		this.origMin = this.state.currentMin; //The original amount of minutes, before the timer started
@@ -34,28 +47,6 @@ export default class Timer extends React.Component {
 			min: this.state.currentMin,
 			timeSeperator: this.state.timeSeperator
 		});
-		// port.onMessage.addListener(function(msg) {
-		// 	console.log("The port has opened or whatnot");
-		// 	let min = msg.min;
-		// 	let sec = msg.sec;
-		// 	let timeSeperator = msg.timeSeperator;
-		// 	currentComponent.setState({
-		// 		currentMin: min,
-		// 		currentSec: sec,
-		// 		timeSeperator: timeSeperator
-		// 	});
-		// });
-		chrome.runtime.onConnect.addListener(function(port2) {
-			console.assert(port2.name == "port2");
-			port.onMessage.addListener(function(msg) {
-				currentComponent.setState({
-					currentMin: msg.min,
-					currentSec: msg.sec,
-					timeSeperator: msg.timeSeperator
-				});
-			});
-		});
-
 		// var port = chrome.runtime.connect({ name: "knockknock" });
 		// port.postMessage({ joke: "Knock knock" });
 		// port.onMessage.addListener(function(msg) {
